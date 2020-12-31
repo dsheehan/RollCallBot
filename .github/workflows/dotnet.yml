@@ -39,6 +39,7 @@ jobs:
     - name: Test
       run: dotnet test -c Release --no-build --verbosity normal
     - name: Pack
+      id: pack
       run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source $PROJECT_NAME.*proj
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -47,5 +48,5 @@ jobs:
         path: ./bin/Release/*.nupkg
     - name: Dump GitHub context
       env:
-       GITHUB_CONTEXT: ${{ toJson(github) }} ${{ toJson(env) }} ${{ toJson(steps) }} ${{ toJson(job) }}
+       GITHUB_CONTEXT: ${{ toJson(steps.pack) }}
       run: echo "$GITHUB_CONTEXT"
