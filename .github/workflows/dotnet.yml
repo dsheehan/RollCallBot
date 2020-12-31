@@ -43,5 +43,5 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.PROJECT_NAME }}.${{ steps.Pack.outputs.version }}_nupkg
+        name: ${{ env.PROJECT_NAME }}.${{ env.VERSION }}_nupkg
         path: ./bin/Release/*.nupkg
