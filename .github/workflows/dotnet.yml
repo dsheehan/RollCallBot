@@ -39,9 +39,9 @@ jobs:
     - name: Test
       run: dotnet test -c Release --no-build --verbosity normal
     - name: Pack
-      run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source -p:PackageVersion=$GITHUB_RUN_ID $PROJECT_NAME.*proj
+      run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source $PROJECT_NAME.*proj
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: nupkg
+        name: $PROJECT_NAME.${{ env.version }}
         path: ./bin/Release/*.nupkg
