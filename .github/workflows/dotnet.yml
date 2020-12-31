@@ -47,5 +47,5 @@ jobs:
         path: ./bin/Release/*.nupkg
     - name: Dump GitHub context
       env:
-       GITHUB_CONTEXT: ${{ toJson(github) }} ${{ toJson(env) }}
+       GITHUB_CONTEXT: ${{ toJson(github) }} ${{ toJson(env) }} ${{ toJson(steps) }} ${{ toJson(job) }}
       run: echo "$GITHUB_CONTEXT"
