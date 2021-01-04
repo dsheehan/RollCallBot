@@ -41,11 +41,18 @@ jobs:
     - name: Pack
       id: pack
       run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source $PROJECT_NAME.*proj
-    - name: Upload Artifact
+    - name: Publish
+      run: dotnet publish -c Release --no-build --no-restore --self-contained true
+    - name: Upload nupkg
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.PROJECT_NAME }}.${{ env.VERSION }}_nupkg
+        name: ${{ env.PROJECT_NAME }}_nupkg
         path: ./bin/Release/*.nupkg
+    - name: Upload exe
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.PROJECT_NAME }}_nupkg
+        path: ./bin/Release/**/publish/*
     - name: Dump GitHub context
       env:
        GITHUB_CONTEXT: ${{ toJson(steps.pack) }}
