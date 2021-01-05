@@ -38,25 +38,27 @@ namespace RollCallBot
             return found;
         }
         
-        public async Task MessageDeletedAsync(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
+        public Task MessageDeletedAsync(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
         {
-            throw new NotImplementedException();
+            _logger.LogDebug($"Message Deleted: {arg1.Id}");
+            return Task.CompletedTask;
         }
 
         public async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> cacheableMessage,
             ISocketMessageChannel channel, SocketReaction reaction)
         {
-            _logger.LogDebug($"Reaction Removed: UserId={reaction.UserId} MessageId={cacheableMessage.Id} ChannelId={channel.Id} Emote={reaction.Emote.Name}");
-            _ReactionRemovedAsync(cacheableMessage, channel, reaction).ContinueWith(x =>
+            await _ReactionRemovedAsync(cacheableMessage, channel, reaction).ContinueWith(x =>
             {
                 if (x.Exception != null)
                     _logger.LogError(x.Exception, "_ReactionRemovedAsync");
-            });
+            }).ConfigureAwait(false);
         }
 
         private async Task _ReactionRemovedAsync(Cacheable<IUserMessage, ulong> cacheableMessage,
             ISocketMessageChannel channel, SocketReaction reaction)
         {
+            _logger.LogDebug($"Reaction Removed: UserId={reaction.UserId} MessageId={cacheableMessage.Id} ChannelId={channel.Id} Emote={reaction.Emote.Name}");
+            
             if (reaction.UserId == _client.CurrentUser.Id)
                 return;
             var message = await cacheableMessage.GetOrDownloadAsync();
@@ -72,29 +74,27 @@ namespace RollCallBot
             await m.UpdateAsync(message);
         }
 
-        public async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> cacheableMessage,
-            ISocketMessageChannel channel, SocketReaction reaction)
+        public async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            _logger.LogDebug($"Reaction Added: UserId={reaction.UserId} MessageId={cacheableMessage.Id} ChannelId={channel.Id} Emote={reaction.Emote.Name}");
-            _ReactionAddedAsync(cacheableMessage, channel, reaction)
-                .ContinueWith(x =>
-                {
-                    if (x.Exception != null)
-                        _logger.LogError(x.Exception, "_ReactionAddedAsync");
-                });
+            await _ReactionAddedAsync(cacheableMessage, channel, reaction).ContinueWith(x =>
+            {
+                if (x.Exception != null)
+                    _logger.LogError(x.Exception, "_ReactionAddedAsync");
+            }).ConfigureAwait(false);
         }
 
-        private async Task _ReactionAddedAsync(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2,
-            SocketReaction arg3)
+        private async Task _ReactionAddedAsync(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            if (arg3.UserId == _client.CurrentUser.Id)
+            _logger.LogDebug($"Reaction Added: UserId={reaction.UserId} MessageId={cacheableMessage.Id} ChannelId={channel.Id} Emote={reaction.Emote.Name}");
+            
+            if (reaction.UserId == _client.CurrentUser.Id)
                 return;
 
-            var message = await arg1.GetOrDownloadAsync();
+            var message = await cacheableMessage.GetOrDownloadAsync();
             if(message == null)
                 return;
             
-            var m = Find(arg1.Id);
+            var m = Find(cacheableMessage.Id);
             if (m == null)
             {
                 _logger.LogDebug("Reaction Added: Recreating older message");
@@ -102,7 +102,7 @@ namespace RollCallBot
                 Messages.Add(m);
             }
 
-            m.Add(arg3.User.Value, arg3.Emote.Name);
+            m.Add(reaction.User.Value, reaction.Emote.Name);
             await m.UpdateAsync(message);
         }
 
