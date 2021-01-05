@@ -47,12 +47,12 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.PROJECT_NAME }}_nupkg
-        path: ./bin/Release/*.nupkg
+        path: .src/bin/Release/*.nupkg
     - name: Upload exe
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.PROJECT_NAME }}_exe
-        path: ./bin/Release/net5.0/publish/*
+        path: .src/bin/Release/net5.0/publish/*
     - name: Push to GitHub Packages
       uses: docker/build-push-action@v1
       with:
@@ -63,5 +63,5 @@ jobs:
         tag_with_ref: true
         tag_with_sha: true
         add_git_labels: true
-        path: /home/runner/work/RollCallBot/RollCallBot/   
+        path: /home/runner/work/RollCallBot/RollCallBot/src/   
         tags: latest
