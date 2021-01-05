@@ -64,4 +64,4 @@ jobs:
         tag_with_sha: true
         add_git_labels: true
         path: /home/runner/work/RollCallBot/RollCallBot/   
-      
+        tags: latest
