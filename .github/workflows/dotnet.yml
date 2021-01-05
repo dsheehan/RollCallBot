@@ -60,8 +60,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
         registry: docker.pkg.github.com
         repository: dsheehan/rollcallbot/rollcallbot
-        tag_with_ref: true
         tag_with_sha: true
         add_git_labels: true
-        path: /home/runner/work/RollCallBot/RollCallBot/src/   
-        tags: latest
+        path: /home/runner/work/RollCallBot/RollCallBot/   
+        tags: unstable
