@@ -91,6 +91,9 @@ namespace RollCallBot
                 return;
 
             var message = await arg1.GetOrDownloadAsync();
+            if(message == null)
+                return;
+            
             var m = Find(arg1.Id);
             if (m == null)
             {
