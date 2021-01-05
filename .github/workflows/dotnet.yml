@@ -47,12 +47,12 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.PROJECT_NAME }}_nupkg
-        path: .src/bin/Release/*.nupkg
+        path: ./src/bin/Release/*.nupkg
     - name: Upload exe
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.PROJECT_NAME }}_exe
-        path: .src/bin/Release/net5.0/publish/*
+        path: ./src/bin/Release/net5.0/publish/*
     - name: Push to GitHub Packages
       uses: docker/build-push-action@v1
       with:
