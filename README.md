@@ -1,4 +1,4 @@
-# RollCallBot
+# RollCallBot [![.NET Build Status](https://github.com/dsheehan/RollCallBot/workflows/.NET/badge.svg)](https://github.com/dsheehan/RollCallBot/actions?query=workflow%3A.NET)
 A basic discord bot used to manage the roll call for an Among Us discord server.
 Responds to "Roll Call" command with an embed to track yes/no/maybe responses.
 
