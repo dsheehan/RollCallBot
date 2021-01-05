@@ -40,7 +40,7 @@ jobs:
       run: dotnet test -c Release --no-build --verbosity normal
     - name: Pack
       id: pack
-      run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source $PROJECT_NAME.*proj
+      run: dotnet pack -v normal -c Release --no-restore --include-symbols --include-source src/$PROJECT_NAME.*proj
     - name: Publish
       run: dotnet publish -c Release --no-build --no-restore --self-contained true
     - name: Upload nupkg
