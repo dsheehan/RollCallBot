@@ -59,7 +59,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         registry: docker.pkg.github.com
-        repository: dsheehan/RollCallBot/RollCallBot
+        repository: dsheehan/rollcallbot/rollcallbot
         tag_with_ref: true
         tag_with_sha: true
         add_git_labels: true   
