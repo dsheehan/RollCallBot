@@ -78,15 +78,11 @@ jobs:
       if: "startsWith(github.ref, 'refs/tags/v')"
       uses: docker/build-push-action@v1
       with:
-        push: false
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         registry: docker.pkg.github.com
         repository: dsheehan/rollcallbot/rollcallbot
         path: /home/runner/work/RollCallBot/RollCallBot/   
         tags: latest,${{ steps.onversion.outputs.VERSION }}
-      env:
-        VERSION: ${{ steps.onversion.outputs.VERSION}}
-        SOURCE_TAG: ${{ steps.onversion.outputs.SOURCE_TAG}}
           
 
