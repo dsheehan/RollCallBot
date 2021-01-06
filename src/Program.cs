@@ -1,15 +1,10 @@
-﻿using System.Linq;
-
-
-namespace RollCallBot
+﻿namespace RollCallBot
 {
     using System;
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Console;
     using Discord;
     using Discord.Commands;
     using Discord.WebSocket;
@@ -36,10 +31,6 @@ namespace RollCallBot
             _client = client;
             _messageHandler = messageHandler;
             _commands = commands;
-            
-            // Subscribe the logging handler to both the client and the CommandService.
-            _client.Log += Log;
-            _commands.Log += Log;
         }
         
         private static IServiceProvider ConfigureServices()
@@ -56,45 +47,15 @@ namespace RollCallBot
             };
             
             var map = new ServiceCollection()
-                .AddLogging(opt =>
-                {
-                    opt.AddConsole();
-                    opt.AddDebug();
-                })
                 .AddSingleton(discordSocketConfig)
                 .AddSingleton(commandServiceConfig)
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<MessageHandler>()
+                .AddSingleton<LoggingService>()
                 .AddSingleton<Program>();
 
             return map.BuildServiceProvider(true);
-        }
-        
-        private static Task Log(LogMessage message)
-        {
-            switch (message.Severity)
-            {
-                case LogSeverity.Critical:
-                case LogSeverity.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    break;
-                case LogSeverity.Warning:
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    break;
-                case LogSeverity.Info:
-                    Console.ForegroundColor = ConsoleColor.White;
-                    break;
-                case LogSeverity.Verbose:
-                case LogSeverity.Debug:
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    break;
-            }
-
-            Console.WriteLine($"{DateTime.Now,-19} [{message.Severity,8}] {message.Source}: {message.Message} {message.Exception}");
-            Console.ResetColor();
-            
-            return Task.CompletedTask;
         }
 
         private async Task MainAsync(string[] strings)

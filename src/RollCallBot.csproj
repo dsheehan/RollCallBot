@@ -4,15 +4,11 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <MinVerTagPrefix>v</MinVerTagPrefix>
-        <BaseOutputPath></BaseOutputPath>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Discord.Net" Version="2.2.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
-      <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="5.0.0" />
       <PackageReference Include="MinVer" Version="2.4.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

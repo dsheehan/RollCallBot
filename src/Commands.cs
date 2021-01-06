@@ -1,21 +1,15 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-using System.Transactions;
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.Logging;
-
-namespace RollCallBot
+﻿namespace RollCallBot
 {
-    // Create a module with no prefix
+    using System.Threading.Tasks;
+    using Discord;
+    using Discord.Commands;
+    
     public class Commands : ModuleBase<SocketCommandContext>
     {
         private readonly MessageHandler _messageHandler;
-        private readonly ILogger<Commands> _logger;
+        private readonly LoggingService _logger;
 
-        public Commands(MessageHandler messageHandler, ILogger<Commands> logger)
+        public Commands(MessageHandler messageHandler, LoggingService logger)
         {
             _messageHandler = messageHandler;
             _logger = logger;
@@ -26,7 +20,7 @@ namespace RollCallBot
         [Summary("Start a roll call")]
         public async Task ReactAsync([Remainder] string description)
         {
-            _logger.LogInformation($"New Roll Call: {description}");
+            await _logger.Log(new LogMessage(LogSeverity.Info, nameof(Commands), $"New Roll Call: {description}"));
             var emoji = new Emoji("\uD83D\uDC4C");   // equivalent to "👌"
             
             await Context.Message.AddReactionAsync(emoji);
@@ -40,13 +34,14 @@ namespace RollCallBot
         [Summary("Start a roll call")]
         public async Task ReactAsync2()
         {
-            _logger.LogInformation($"New Roll Call");
-            var emoji = new Emoji("\uD83D\uDC4C");   // equivalent to "👌"
-            
-            await Context.Message.AddReactionAsync(emoji);
-            // var message = new Message(description);
-            var message = _messageHandler.AddNewMessage(null);
-            await message.Send(Context.Channel);
+            await ReactAsync(null);
+        }
+        
+        [Command("Version", RunMode = RunMode.Async)]
+        [Summary("Get bot version")]
+        public async Task Version()
+        {
+            await ReplyAsync(Util.Version());
         }
     }
 }

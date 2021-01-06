@@ -1,24 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.Logging;
-
-namespace RollCallBot
+﻿namespace RollCallBot
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Discord;
+    using Discord.Commands;
+    using Discord.WebSocket;
+    
     public class MessageHandler
     {
         private List<Message> Messages = new List<Message>();
-        private readonly ILogger<MessageHandler> _logger;
+        private readonly LoggingService _logger;
 
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
         
-        public MessageHandler(DiscordSocketClient client, CommandService commands, IServiceProvider services, ILogger<MessageHandler> logger)
+        public MessageHandler(DiscordSocketClient client, CommandService commands, IServiceProvider services, LoggingService logger)
         {
             _client = client;
             _commands = commands;
@@ -38,26 +37,27 @@ namespace RollCallBot
             return found;
         }
         
-        public Task MessageDeletedAsync(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
+        public async Task MessageDeletedAsync(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
         {
-            _logger.LogDebug($"Message Deleted: {arg1.Id}");
-            return Task.CompletedTask;
+            await _logger.Log(new LogMessage(LogSeverity.Debug, nameof(MessageHandler), $"Message Deleted: {arg1.Id}"));
         }
 
         public async Task ReactionRemovedAsync(Cacheable<IUserMessage, ulong> cacheableMessage,
             ISocketMessageChannel channel, SocketReaction reaction)
         {
-            await _ReactionRemovedAsync(cacheableMessage, channel, reaction).ContinueWith(x =>
-            {
-                if (x.Exception != null)
-                    _logger.LogError(x.Exception, "_ReactionRemovedAsync");
-            }).ConfigureAwait(false);
+            await _ReactionRemovedAsync(cacheableMessage, channel, reaction).ContinueWith(LogException).ConfigureAwait(false);
+        }
+
+        private async Task LogException(Task x)
+        {
+            if (x.Exception != null) 
+                await _logger.Log(new LogMessage(LogSeverity.Error, nameof(MessageHandler), x.Exception.Message, x.Exception));
         }
 
         private async Task _ReactionRemovedAsync(Cacheable<IUserMessage, ulong> cacheableMessage,
             ISocketMessageChannel channel, SocketReaction reaction)
         {
-            _logger.LogDebug($"Reaction Removed: UserId={reaction.UserId} MessageId={cacheableMessage.Id} ChannelId={channel.Id} Emote={reaction.Emote.Name}");
+            await _logger.Log(new LogMessage(LogSeverity.Debug, nameof(MessageHandler), $"Reaction Removed: UserId={reaction.UserId} MessageId={cacheableMessage.Id} ChannelId={channel.Id} Emote={reaction.Emote.Name}"));
             
             if (reaction.UserId == _client.CurrentUser.Id)
                 return;
@@ -65,7 +65,7 @@ namespace RollCallBot
             var m = Find(cacheableMessage.Id);
             if (m == null)
             {
-                _logger.LogDebug("Reaction Removed: Recreating older message");
+                await _logger.Log(new LogMessage(LogSeverity.Debug, nameof(MessageHandler), "Reaction Removed: Recreating older message"));
                 m = new Message(message);
                 Messages.Add(m);
             }
@@ -76,16 +76,12 @@ namespace RollCallBot
 
         public async Task ReactionAddedAsync(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            await _ReactionAddedAsync(cacheableMessage, channel, reaction).ContinueWith(x =>
-            {
-                if (x.Exception != null)
-                    _logger.LogError(x.Exception, "_ReactionAddedAsync");
-            }).ConfigureAwait(false);
+            await _ReactionAddedAsync(cacheableMessage, channel, reaction).ContinueWith(LogException).ConfigureAwait(false);
         }
 
         private async Task _ReactionAddedAsync(Cacheable<IUserMessage, ulong> cacheableMessage, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            _logger.LogDebug($"Reaction Added: UserId={reaction.UserId} MessageId={cacheableMessage.Id} ChannelId={channel.Id} Emote={reaction.Emote.Name}");
+            await _logger.Log(new LogMessage(LogSeverity.Debug, nameof(MessageHandler), $"Reaction Added: UserId={reaction.UserId} MessageId={cacheableMessage.Id} ChannelId={channel.Id} Emote={reaction.Emote.Name}"));
             
             if (reaction.UserId == _client.CurrentUser.Id)
                 return;
@@ -97,7 +93,7 @@ namespace RollCallBot
             var m = Find(cacheableMessage.Id);
             if (m == null)
             {
-                _logger.LogDebug("Reaction Added: Recreating older message");
+                await _logger.Log(new LogMessage(LogSeverity.Debug, nameof(MessageHandler), "Reaction Added: Recreating older message"));
                 m = new Message(message);
                 Messages.Add(m);
             }
@@ -130,7 +126,7 @@ namespace RollCallBot
 
                 // Execute the command. (result does not indicate a return value, 
                 // rather an object stating if the command executed successfully)
-                _logger.LogInformation($"Handle Command: {msg.Content}");
+                await _logger.Log(new LogMessage(LogSeverity.Info, nameof(MessageHandler), $"Handle Command: {msg.Content}"));
                 var result = await _commands.ExecuteAsync(context, pos, _services);
 
                 // Uncomment the following lines if you want the bot
