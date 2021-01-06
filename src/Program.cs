@@ -22,15 +22,15 @@
         private readonly IServiceProvider _services;
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
-        private readonly MessageHandler _messageHandler;
+        private readonly LoggingService _logger;
         private readonly string DiscordToken = Environment.GetEnvironmentVariable("RollCallBotToken");
         
-        public Program(IServiceProvider services, DiscordSocketClient client, CommandService commands, MessageHandler messageHandler)
+        public Program(IServiceProvider services, DiscordSocketClient client, CommandService commands, LoggingService logger)
         {
             _services = services;
             _client = client;
-            _messageHandler = messageHandler;
             _commands = commands;
+            _logger = logger;
         }
         
         private static IServiceProvider ConfigureServices()
@@ -58,11 +58,17 @@
             return map.BuildServiceProvider(true);
         }
 
-        private async Task MainAsync(string[] strings)
+        private async Task MainAsync(string[]  strings)
         {
+            // setup the logger before doing anything else
+            _client.Log += _logger.Log;
+            _commands.Log += _logger.Log;
+            
+            await _logger.Log(new LogMessage(LogSeverity.Info, nameof(Program), $"Version: {Util.Version()}"));
+            
             // Centralize the logic for commands into a separate method.
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
-
+            
             // Login and connect.
             await _client.LoginAsync(TokenType.Bot, DiscordToken);
             await _client.StartAsync();
