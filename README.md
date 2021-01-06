@@ -1,8 +1,13 @@
 # RollCallBot [![.NET Build Status](https://github.com/dsheehan/RollCallBot/workflows/.NET/badge.svg)](https://github.com/dsheehan/RollCallBot/actions?query=workflow%3A.NET)
 A basic discord bot used to manage the roll call for an Among Us discord server.
-Responds to "Roll Call" command with an embed to track yes/no/maybe responses.
-
+Responds to "Roll Call" command with an embed to track yes/no/maybe responses.\
+![Screenshot](https://github.com/dsheehan/RollCallBot/blob/2ba1663f60b0a90f940dd19e6f1a905e9a9ea09e/screenshot.png)\
 Requires setting an environment variable `RollCallBotToken` with a discord bot token.
+## Docker versions
+rollcallbot:latest = latest released version\
+rollcallbot:unstable = latest CI build, likely unstable\
+rollcallbot:sha-* specific unstable version \
+rollcallbot:v* = specific released version
 
 ## Example docker run
 ``` sh
