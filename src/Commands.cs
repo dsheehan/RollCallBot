@@ -7,12 +7,14 @@
     public class Commands : ModuleBase<SocketCommandContext>
     {
         private readonly MessageHandler _messageHandler;
-        private readonly LoggingService _logger;
+        private readonly ILoggingService _logger;
+        private ISettings _settings;
 
-        public Commands(MessageHandler messageHandler, LoggingService logger)
+        public Commands(MessageHandler messageHandler, ILoggingService logger, ISettings settings)
         {
             _messageHandler = messageHandler;
             _logger = logger;
+            _settings = settings;
         }
         
         [Command("Roll Call", RunMode = RunMode.Async)]
@@ -41,7 +43,7 @@
         [Summary("Get bot version")]
         public async Task Version()
         {
-            await ReplyAsync(Util.Version());
+            await ReplyAsync(_settings.Version);
         }
     }
 }

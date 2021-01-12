@@ -11,13 +11,13 @@
     public class MessageHandler
     {
         private List<Message> Messages = new List<Message>();
-        private readonly LoggingService _logger;
+        private readonly ILoggingService _logger;
 
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly IServiceProvider _services;
         
-        public MessageHandler(DiscordSocketClient client, CommandService commands, IServiceProvider services, LoggingService logger)
+        public MessageHandler(DiscordSocketClient client, CommandService commands, IServiceProvider services, ILoggingService logger)
         {
             _client = client;
             _commands = commands;

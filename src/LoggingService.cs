@@ -4,7 +4,13 @@
     using System.Threading.Tasks;
     using Discord;
 
-    public class LoggingService
+    public interface ILoggingService
+    {
+        public Task Log(LogMessage message);
+    }
+    
+    /// <summary>Default implementation of <see cref="ILoggingService"/></summary>
+    public class LoggingService : ILoggingService
     {
         public Task Log(LogMessage message)
         {

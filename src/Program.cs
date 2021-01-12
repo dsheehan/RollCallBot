@@ -11,7 +11,7 @@
 
     public class Program
     {
-        // Program entry point
+        /// <summary>Program entry point</summary>
         public static async Task Main(string[] args)
         {
             var services = ConfigureServices();
@@ -22,14 +22,16 @@
         private readonly IServiceProvider _services;
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
-        private readonly LoggingService _logger;
+        private readonly ILoggingService _logger;
+        private readonly ISettings _settings;
 
-        public Program(IServiceProvider services, DiscordSocketClient client, CommandService commands, LoggingService logger)
+        public Program(IServiceProvider services, DiscordSocketClient client, CommandService commands, ILoggingService logger, ISettings settings)
         {
             _services = services;
             _client = client;
             _commands = commands;
             _logger = logger;
+            _settings = settings;
         }
         
         private static IServiceProvider ConfigureServices()
@@ -51,7 +53,8 @@
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<MessageHandler>()
-                .AddSingleton<LoggingService>()
+                .AddSingleton<ILoggingService, LoggingService>()
+                .AddSingleton<ISettings, Settings>()
                 .AddSingleton<Program>();
 
             return map.BuildServiceProvider(true);
@@ -63,13 +66,13 @@
             _client.Log += _logger.Log;
             _commands.Log += _logger.Log;
             
-            await _logger.Log(new LogMessage(LogSeverity.Info, nameof(Program), $"Version: {Util.Version()}"));
+            await _logger.Log(new LogMessage(LogSeverity.Info, nameof(Program), $"Version: {_settings.Version}"));
             
             // Centralize the logic for commands into a separate method.
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
             
             // Login and connect.
-            await _client.LoginAsync(TokenType.Bot, Util.RollCallBotToken());
+            await _client.LoginAsync(TokenType.Bot, _settings.RollCallBotToken);
             await _client.StartAsync();
 
             // Wait infinitely so your bot actually stays connected.
