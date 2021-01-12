@@ -23,8 +23,7 @@
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly LoggingService _logger;
-        private readonly string DiscordToken = Environment.GetEnvironmentVariable("RollCallBotToken");
-        
+
         public Program(IServiceProvider services, DiscordSocketClient client, CommandService commands, LoggingService logger)
         {
             _services = services;
@@ -70,7 +69,7 @@
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
             
             // Login and connect.
-            await _client.LoginAsync(TokenType.Bot, DiscordToken);
+            await _client.LoginAsync(TokenType.Bot, Util.RollCallBotToken());
             await _client.StartAsync();
 
             // Wait infinitely so your bot actually stays connected.
